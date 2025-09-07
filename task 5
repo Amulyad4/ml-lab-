@@ -1,0 +1,49 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+# Load the Iris dataset (a common dataset for classification)
+data = load_iris()
+X = data.data  # Features
+y = data.target  # Labels
+
+# Split the dataset into training and testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 1. PCA - Principal Component Analysis
+pca = PCA(n_components=2)  # Reducing to 2 components
+X_train_pca = pca.fit_transform(X_train)
+X_test_pca = pca.transform(X_test)
+
+# 2. LDA - Linear Discriminant Analysis
+lda = LDA(n_components=2)  # Reducing to 2 components
+X_train_lda = lda.fit_transform(X_train, y_train)
+X_test_lda = lda.transform(X_test)
+
+# 3. Plot the reduced data
+
+# PCA plot
+plt.figure(figsize=(14, 6))
+plt.subplot(1, 2, 1)
+plt.scatter(X_train_pca[:, 0], X_train_pca[:, 1], c=y_train, cmap='viridis', edgecolor='k', s=50)
+plt.title("PCA - Training Data")
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.colorbar(label="Classes")
+
+# LDA plot
+plt.subplot(1, 2, 2)
+plt.scatter(X_train_lda[:, 0], X_train_lda[:, 1], c=y_train, cmap='viridis', edgecolor='k', s=50)
+plt.title("LDA - Training Data")
+plt.xlabel("Linear Discriminant 1")
+plt.ylabel("Linear Discriminant 2")
+plt.colorbar(label="Classes")
+
+plt.tight_layout()
+plt.show()
+
+# Print explained variance ratio for PCA
+print(f"Explained variance ratio for PCA: {pca.explained_variance_ratio_}")
