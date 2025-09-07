@@ -1,0 +1,48 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+# Load the dataset
+file_path = '/kaggle/input/sms-spam-collection-dataset/spam.csv'
+data = pd.read_csv(file_path, encoding='latin-1')
+
+# Keep only the first two columns
+data = data[['v1', 'v2']]
+
+# Rename them
+data = data.rename(columns={'v1': 'label', 'v2': 'text'})
+
+# Encode labels: ham → 0, spam → 1
+data['label'] = data['label'].map({'ham': 0, 'spam': 1})
+
+# Split data into features and target
+X = data['text']  # Email text
+y = data['label']  # Spam or not spam
+
+# Convert text data into numerical format using CountVectorizer
+vectorizer = CountVectorizer(stop_words='english')
+X_vectorized = vectorizer.fit_transform(X)
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X_vectorized, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# Logistic Regression Model
+model = LogisticRegression(max_iter=1000)  # increase iterations for convergence
+model.fit(X_train, y_train)
+
+# Predictions
+y_pred = model.predict(X_test)
+
+# Evaluation
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+print("\nAccuracy Score:")
+print(accuracy_score(y_test, y_pred))
